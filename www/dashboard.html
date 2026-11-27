@@ -1,22 +1,640 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
-</head>
-<body>
-    <h1>Dashboard</h1>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <p>Welcome! You are logged in.</p>
+    <title>Controller Management - Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #edf0f2;
+            color: #263238;
+        }
+
+        header {
+            background: #263746;
+            color: white;
+            padding: 22px 35px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        nav {
+            background: #ffffff;
+            border-bottom: 1px solid #d5dadd;
+            padding: 14px 35px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        nav a {
+            color: #315d78;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        nav form {
+            margin-left: auto;
+        }
+
+        nav button {
+            background: #315d78;
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 1250px;
+            margin: 35px auto;
+            padding: 0 25px;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-heading h2 {
+            margin: 0;
+            font-size: 23px;
+        }
+
+        #connection-status {
+            font-size: 13px;
+            color: #64747d;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #d5dadd;
+            padding: 18px;
+        }
+
+        .summary-card p {
+            color: #65747c;
+            font-size: 13px;
+            margin: 0 0 9px;
+        }
+
+        .summary-card strong {
+            font-size: 25px;
+        }
+
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .device-card {
+            background: white;
+            border: 1px solid #d5dadd;
+            padding: 20px;
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #e1e5e8;
+            padding-bottom: 13px;
+        }
+
+        .device-header h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .device-id {
+            color: #718087;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .status {
+            padding: 5px 9px;
+            font-size: 11px;
+            text-transform: uppercase;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+
+        .status-normal {
+            background: #e4efe8;
+            color: #286341;
+        }
+
+        .status-warning {
+            background: #fff1d9;
+            color: #8b5a12;
+        }
+
+        .status-critical {
+            background: #f9e3e1;
+            color: #a12e28;
+        }
+
+        .status-defrosting {
+            background: #dceaf4;
+            color: #285d7b;
+        }
+
+        .status-defrost-complete {
+            background: #e4efe8;
+            color: #286341;
+        }
+
+        .device-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 17px 0;
+        }
+
+        .info-item span {
+            display: block;
+            color: #718087;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .info-item strong {
+            font-size: 14px;
+        }
+
+        .temperature-section {
+            background: #f6f8f9;
+            padding: 14px;
+            margin-top: 10px;
+        }
+
+        .temperature-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .temperature-heading span {
+            font-size: 13px;
+            color: #65747c;
+        }
+
+        .temperature-value {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .temperature-track {
+            height: 9px;
+            background: #dce2e6;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .temperature-fill {
+            height: 100%;
+            width: 0%;
+            background: #315d78;
+            border-radius: 5px;
+            transition: width 0.9s linear;
+        }
+
+        .temperature-fill.heating {
+            background: #c77b36;
+        }
+
+        .device-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 17px;
+        }
+
+        .online-indicator {
+            font-size: 12px;
+            color: #65747c;
+        }
+
+        .defrost-button {
+            background: #315d78;
+            color: white;
+            border: none;
+            padding: 10px 17px;
+            cursor: pointer;
+        }
+
+        .defrost-button:hover:not(:disabled) {
+            background: #24465c;
+        }
+
+        .defrost-button:disabled {
+            background: #aab5bc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            background: white;
+            padding: 25px;
+            border: 1px solid #d5dadd;
+            color: #65747c;
+        }
+
+        #notification {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #263746;
+            color: white;
+            padding: 14px 20px;
+            display: none;
+            max-width: 320px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 750px) {
+            .device-grid,
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .page-heading {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Refrigeration Controller Management</h1>
+    </header>
 
     <nav>
-        <a href="/dashboard.html">Dashboard</a> |
-        <a href="/settings.html">Settings</a> |
-	<form action="/logout" method="POST">
-    		<button type="submit">Logout</button>
-	</form>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/settings.html">Settings</a>
+
+        <form action="/logout" method="POST">
+            <button type="submit">Logout</button>
+        </form>
     </nav>
+
+    <main>
+
+        <div class="page-heading">
+            <h2>System Overview</h2>
+            <span id="connection-status">Connecting...</span>
+        </div>
+
+        <section class="summary">
+
+            <div class="summary-card">
+                <p>Total controllers</p>
+                <strong id="total-devices">--</strong>
+            </div>
+
+            <div class="summary-card">
+                <p>Online controllers</p>
+                <strong id="online-devices">--</strong>
+            </div>
+
+            <div class="summary-card">
+                <p>Active defrost cycles</p>
+                <strong id="active-defrosts">--</strong>
+            </div>
+
+        </section>
+
+        <h2>Controllers</h2>
+
+        <section id="devices" class="device-grid">
+            <div class="loading">Loading controllers...</div>
+        </section>
+
+    </main>
+
+    <div id="notification"></div>
+
+    <script>
+
+        const container = document.getElementById("devices");
+
+        let notificationTimeout;
+
+        function showNotification(message) {
+            const notification =
+                document.getElementById("notification");
+
+            notification.textContent = message;
+            notification.style.display = "block";
+
+            clearTimeout(notificationTimeout);
+
+            notificationTimeout = setTimeout(() => {
+                notification.style.display = "none";
+            }, 3500);
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                normal: "status-normal",
+                warning: "status-warning",
+                critical: "status-critical",
+                defrosting: "status-defrosting",
+                defrost_complete: "status-defrost-complete"
+            };
+
+            return classes[status] || "status-normal";
+        }
+
+        function getStatusLabel(status) {
+            return status.replaceAll("_", " ");
+        }
+
+        function getTemperatureWidth(temperature) {
+            // Display range: -30°C to +05°C
+            const width = ((temperature + 30) / 80) * 100;
+
+            return Math.max(0, Math.min(100, width));
+        }
+
+        function createDeviceCard(device) {
+
+            const card = document.createElement("article");
+            card.className = "device-card";
+            card.dataset.id = device.id;
+
+            const header = document.createElement("div");
+            header.className = "device-header";
+
+            const titleContainer = document.createElement("div");
+
+            const title = document.createElement("h3");
+            title.textContent = device.name;
+
+            const id = document.createElement("div");
+            id.className = "device-id";
+            id.textContent = device.id;
+
+            titleContainer.append(title, id);
+
+            const status = document.createElement("span");
+            status.className =
+                "status " + getStatusClass(device.status);
+            status.textContent = getStatusLabel(device.status);
+
+            header.append(titleContainer, status);
+
+            const info = document.createElement("div");
+            info.className = "device-info";
+
+            const ip = createInfoItem("IP Address", device.ip);
+
+            const online = createInfoItem(
+                "Connection",
+                device.online ? "Online" : "Offline"
+            );
+
+            info.append(ip, online);
+
+            const temperatureSection =
+                document.createElement("div");
+
+            temperatureSection.className = "temperature-section";
+
+            const temperatureHeading =
+                document.createElement("div");
+
+            temperatureHeading.className = "temperature-heading";
+
+            const temperatureLabel =
+                document.createElement("span");
+
+            temperatureLabel.textContent = "Current temperature";
+
+            const temperatureValue =
+                document.createElement("strong");
+
+            temperatureValue.className = "temperature-value";
+            temperatureValue.textContent =
+                Number(device.temperature).toFixed(1) + " °C";
+
+            temperatureHeading.append(
+                temperatureLabel,
+                temperatureValue
+            );
+
+            const track = document.createElement("div");
+            track.className = "temperature-track";
+
+            const fill = document.createElement("div");
+            fill.className = "temperature-fill";
+
+            fill.style.width =
+                getTemperatureWidth(device.temperature) + "%";
+
+            if (device.status === "defrosting") {
+                fill.classList.add("heating");
+            }
+
+            track.appendChild(fill);
+
+            temperatureSection.append(
+                temperatureHeading,
+                track
+            );
+
+            const footer = document.createElement("div");
+            footer.className = "device-footer";
+
+            const onlineIndicator =
+                document.createElement("span");
+
+            onlineIndicator.className = "online-indicator";
+            onlineIndicator.textContent =
+                device.online ? "Controller available" : "Controller offline";
+
+            const button = document.createElement("button");
+            button.className = "defrost-button";
+
+            button.textContent =
+                device.status === "defrosting"
+                    ? "Defrosting..."
+                    : device.status === "defrost_complete"
+                        ? "Defrost Complete"
+                        : "Start Defrost";
+
+            button.disabled =
+                !device.online ||
+                device.status === "defrosting";
+
+            button.addEventListener("click", () => {
+                startDefrost(device.id);
+            });
+
+            footer.append(onlineIndicator, button);
+
+            card.append(
+                header,
+                info,
+                temperatureSection,
+                footer
+            );
+
+            return card;
+        }
+
+        function createInfoItem(label, value) {
+            const item = document.createElement("div");
+            item.className = "info-item";
+
+            const name = document.createElement("span");
+            name.textContent = label;
+
+            const content = document.createElement("strong");
+            content.textContent = value;
+
+            item.append(name, content);
+
+            return item;
+        }
+
+        async function loadDevices() {
+
+            try {
+
+                const response = await fetch("/api/devices", {
+                    cache: "no-store"
+                });
+
+                if (response.status === 403) {
+                    window.location.href = "/";
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error("Unable to retrieve controllers.");
+                }
+
+                const devices = await response.json();
+
+                container.replaceChildren();
+
+                let onlineCount = 0;
+                let activeDefrostCount = 0;
+
+                devices.forEach(device => {
+
+                    if (device.online) {
+                        onlineCount++;
+                    }
+
+                    if (device.status === "defrosting") {
+                        activeDefrostCount++;
+                    }
+
+                    container.appendChild(
+                        createDeviceCard(device)
+                    );
+                });
+
+                document.getElementById("total-devices")
+                    .textContent = devices.length;
+
+                document.getElementById("online-devices")
+                    .textContent = onlineCount;
+
+                document.getElementById("active-defrosts")
+                    .textContent = activeDefrostCount;
+
+                document.getElementById("connection-status")
+                    .textContent =
+                    "Last update: " + new Date().toLocaleTimeString();
+
+            } catch (error) {
+
+                document.getElementById("connection-status")
+                    .textContent = "Connection error";
+
+                console.error(error);
+            }
+        }
+
+        async function startDefrost(deviceId) {
+
+            if (!confirm(
+                "Start defrost cycle on " + deviceId + "?"
+            )) {
+                return;
+            }
+
+            try {
+
+                const response = await fetch(
+                    "/api/devices/" +
+                    encodeURIComponent(deviceId) +
+                    "/defrost",
+                    {
+                        method: "POST"
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(
+                        result.message || "Unable to start defrost."
+                    );
+                }
+
+                showNotification(result.message);
+
+                await loadDevices();
+
+            } catch (error) {
+
+                showNotification(error.message);
+            }
+        }
+
+        // Initial controller loading
+        loadDevices();
+
+        // Refresh temperatures and statuses every second
+        setInterval(loadDevices, 1000);
+
+    </script>
+
 </body>
 </html>
-

@@ -1,22 +1,354 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Settings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Controller Management - Settings</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #edf0f2;
+            color: #263238;
+        }
+
+        header {
+            background: #263746;
+            color: white;
+            padding: 22px 35px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        nav {
+            background: #ffffff;
+            border-bottom: 1px solid #d5dadd;
+            padding: 14px 35px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        nav a {
+            color: #315d78;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        nav form {
+            margin-left: auto;
+        }
+
+        nav button {
+            background: #315d78;
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            cursor: pointer;
+        }
+
+        nav button:hover {
+            background: #24465c;
+        }
+
+        main {
+            max-width: 1250px;
+            margin: 35px auto;
+            padding: 0 25px;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h2 {
+            margin: 0;
+            font-size: 23px;
+        }
+
+        .page-description {
+            color: #65747c;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #d5dadd;
+            padding: 22px;
+            margin-bottom: 18px;
+            max-width: 700px;
+        }
+
+        .panel h3 {
+            margin: 0;
+            padding-bottom: 13px;
+            border-bottom: 1px solid #e1e5e8;
+            font-size: 17px;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-size: 14px;
+        }
+
+        input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px;
+            margin-top: 7px;
+            border: 1px solid #aeb8bf;
+            background: white;
+            color: #263238;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #315d78;
+        }
+
+        button {
+            background: #315d78;
+            color: white;
+            border: none;
+            padding: 10px 17px;
+            margin-top: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #24465c;
+        }
+
+        .result {
+            margin-top: 12px;
+            font-size: 13px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        footer {
+            text-align: center;
+            color: #65747c;
+            font-size: 12px;
+            margin-top: 35px;
+            padding-bottom: 25px;
+        }
+
+        @media (max-width: 750px) {
+            header {
+                padding: 20px;
+            }
+
+            nav {
+                padding: 14px 20px;
+                gap: 15px;
+            }
+
+            main {
+                margin: 25px auto;
+                padding: 0 18px;
+            }
+
+            .panel {
+                padding: 18px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Settings</h1>
+
+    <header>
+        <h1>Refrigeration Controller Management</h1>
+    </header>
 
     <nav>
-        <a href="/dashboard.html">Dashboard</a> |
-        <a href="/settings.html">Settings</a> |
-	<form action="/logout" method="POST">
-    		<button type="submit">Logout</button>
-	</form>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/settings.html">Settings</a>
+
+        <form action="/logout" method="POST">
+            <button type="submit">Logout</button>
+        </form>
     </nav>
 
-    <p>Settings page.</p>
+    <main>
+
+        <div class="page-heading">
+            <h2>System Settings</h2>
+            <p class="page-description">
+                Configure the email notification settings for the controller management system.
+            </p>
+        </div>
+
+        <h2>SMTP Configuration</h2>
+
+        <section class="panel">
+            <h3>SMTP Server</h3>
+
+            <form data-field="server">
+                <label for="server">Server Address</label>
+
+                <input
+                    id="server"
+                    name="value"
+                    type="text"
+                    placeholder="smtp.example.com"
+                    required
+                >
+
+                <button type="submit">Save Server</button>
+
+                <div class="result"></div>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h3>SMTP Port</h3>
+
+            <form data-field="port">
+                <label for="port">Port</label>
+
+                <input
+                    id="port"
+                    name="value"
+                    type="number"
+                    value="587"
+                    min="1"
+                    max="65535"
+                    required
+                >
+
+                <button type="submit">Save Port</button>
+
+                <div class="result"></div>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h3>Email Address</h3>
+
+            <form data-field="email">
+                <label for="email">Email Address</label>
+
+                <input
+                    id="email"
+                    name="value"
+                    type="email"
+                    placeholder="admin@example.com"
+                    required
+                >
+
+                <button type="submit">Save Email</button>
+
+                <div class="result"></div>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h3>SMTP Username</h3>
+
+            <form data-field="username">
+                <label for="username">Username</label>
+
+                <input
+                    id="username"
+                    name="value"
+                    type="text"
+                    required
+                >
+
+                <button type="submit">Save Username</button>
+
+                <div class="result"></div>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h3>SMTP Password</h3>
+
+            <form data-field="password">
+                <label for="password">Password</label>
+
+                <input
+                    id="password"
+                    name="value"
+                    type="password"
+                    autocomplete="new-password"
+                    required
+                >
+
+                <button type="submit">Save Password</button>
+
+                <div class="result"></div>
+            </form>
+        </section>
+
+        <footer>
+            Controller Management System
+        </footer>
+
+    </main>
+
+    <script>
+        document.querySelectorAll("form[data-field]").forEach(form => {
+            form.addEventListener("submit", async event => {
+                event.preventDefault();
+
+                const field = form.dataset.field;
+                const input = form.querySelector("input");
+                const result = form.querySelector(".result");
+
+                result.textContent = "Saving...";
+
+                try {
+                    const response = await fetch("/api/smtp/config", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            field: field,
+                            value: input.value
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            data.error || "Request failed."
+                        );
+                    }
+
+                    result.textContent =
+                        data.message || "Setting saved.";
+
+                    if (field === "password") {
+                        input.value = "";
+                    }
+
+                } catch (error) {
+                    result.textContent = "Error: " + error.message;
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
-

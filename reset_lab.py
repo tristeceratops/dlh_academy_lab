@@ -2,7 +2,9 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+
 DEVICES_FILE = ROOT / "lab_data" / "devices.json"
+HEADERS_FILE = ROOT / "lab_data" / "headers.conf"
 
 DEFAULT_DEVICES = {
     "controllers": [
@@ -65,14 +67,47 @@ DEFAULT_DEVICES = {
     ]
 }
 
+DEFAULT_HEADERS = """# Simulated NGINX headers configuration
+
+add_header X-Frame-Options "SAMEORIGIN";
+add_header X-Content-Type-Options "nosniff";
+add_header X-Lab-Server "AK-SM-800A";
+"""
+
+
 def reset_devices():
     DEVICES_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     with open(DEVICES_FILE, "w", encoding="utf-8") as file:
-        json.dump(DEFAULT_DEVICES, file, indent=4, ensure_ascii=False)
+        json.dump(
+            DEFAULT_DEVICES,
+            file,
+            indent=4,
+            ensure_ascii=False
+        )
 
     print("[OK] Controllers successfully reset.")
     print(f"[OK] File updated: {DEVICES_FILE}")
 
-if __name__ == "__main__":
+
+def reset_headers():
+    HEADERS_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    HEADERS_FILE.write_text(
+        DEFAULT_HEADERS,
+        encoding="utf-8"
+    )
+
+    print("[OK] NGINX headers configuration successfully reset.")
+    print(f"[OK] File updated: {HEADERS_FILE}")
+
+
+def main():
     reset_devices()
+    reset_headers()
+
+    print("\n[OK] Lab reset completed.")
+
+
+if __name__ == "__main__":
+    main()

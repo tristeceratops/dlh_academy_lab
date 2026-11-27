@@ -4,8 +4,8 @@
             "id": "AK-800-001",
             "name": "Freezer 01",
             "ip": "192.168.1.101",
-            "temperature": 50.0,
-            "status": "defrost_complete",
+            "temperature": -18.5,
+            "status": "normal",
             "online": true
         },
         {

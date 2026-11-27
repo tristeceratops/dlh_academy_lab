@@ -50,8 +50,6 @@ The lab provides:
 - Three vulnerability demonstrations.
 - Browser-based testing through the web interface and Developer Tools.
 
-The server is designed to run on Windows and Ubuntu.
-
 ---
 
 ## 3. Architecture
@@ -64,16 +62,16 @@ The following diagram represents the main components and their relationships.
                     +----------------+
                             |
                             |
-+------------------+   +----------+   +---------------------------+
++-------------------+  +----------+  +---------------------------+
 | load_nginx_headers|<->|  Server  |<->| Online Fridge Monitor     |
-+------------------+   +----------+   | Dashboard                 |
-                            |          +---------------------------+
-                            |                       |
-                            |                       |
-                        +--------+        +--------------------------+
-                        | xml.cgi|        | SMTP Password Settings   |
-                        +--------+        | for Email                |
-                         /      \         +--------------------------+
++-------------------+  +----------+  | Dashboard                 |
+                            |         +---------------------------+
+                            |                     |
+                            |                     |
+                        +--------+      +--------------------------+
+                        | xml.cgi|      | SMTP Password Settings   |
+                        +--------+      | for Email                |
+                         /      \       +--------------------------+
                         /        \
              +----------------+  +---------+
              | read_date_time |  | getauth |
@@ -191,14 +189,11 @@ The settings page provides separate forms for:
 - Username.
 - Password.
 
-For safety and cross-platform compatibility, the current lab does not reproduce unrestricted shell injection.
+For safety, the current lab does not reproduce unrestricted shell injection.
 
 Instead, entering the exact password value `id` triggers a fixed identity command:
 
-| Operating system | Executed command |
-|---|---|
-| Linux | `id` |
-| Windows | `whoami.exe` |
+- The command `id` is executed on the server.
 
 The command is executed without shell interpretation. Its output is printed in the server terminal and returned in the HTTP response.
 
@@ -230,10 +225,9 @@ The lab allows an authenticated user to replace a simulated NGINX configuration 
 
 The configuration can contain additional routes, including:
 
-- `/lab-configuration-check`
 - `/lab-simulated-failure`
 
-The first route demonstrates that the configuration has been modified.
+The first route is defined in the uploaded configuration. It requires a corresponding handler in the Python server to be accessible.
 
 The second returns a simulated HTTP 503 response.
 
@@ -271,11 +265,13 @@ dlh_academy_lab/
 │   ├── request_logger.py
 │   └── main.py
 │
-└── exploit/
-    ├── cve1_auth_payload.py
-    ├── cve2_nginx_exploit.py
-    ├── cve3_smtp_exploit.py
-    └── exploit_headers.conf
+├── exploit/
+│   ├── cve1_auth_payload.py
+│   ├── cve2_nginx_exploit.py
+│   ├── cve3_smtp_exploit.py
+│   └── exploit_headers.conf
+│
+└── reset_devices.py
 ```
 
 ### Important files
@@ -290,29 +286,15 @@ dlh_academy_lab/
 | `endpoints/load_nginx_headers.py` | Handles simulated NGINX configuration replacement. |
 | `lab_data/devices.json` | Stores controller states and temperatures. |
 | `lab_data/headers.conf` | Stores the active simulated NGINX configuration. |
+| `reset_devices.py` | Restores the default controller data and NGINX configuration. |
 
 ---
 
 ## 6. Requirements
 
 - Python 3.10 or later recommended.
-- Windows or Ubuntu.
 - A modern web browser.
 - No third-party Python packages are required by the core lab.
-
-Check your Python installation:
-
-**Windows:**
-
-```powershell
-python --version
-```
-
-**Ubuntu:**
-
-```bash
-python3 --version
-```
 
 ---
 
@@ -320,38 +302,10 @@ python3 --version
 
 Open a terminal in the project directory.
 
-### Windows — PowerShell
-
-Navigate to the project:
-
-```powershell
-cd C:\OSINT-BIA\dlh_academy_lab
-```
-
 Start the server:
 
-```powershell
+```bash
 python -m server.main
-```
-
-Expected output:
-
-```text
-Server running at http://127.0.0.1:8000
-```
-
-### Ubuntu
-
-Navigate to the project directory:
-
-```bash
-cd ~/dlh_academy_lab
-```
-
-Start the server:
-
-```bash
-python3 -m server.main
 ```
 
 Expected output:
@@ -372,25 +326,31 @@ Press `CTRL+C` in the terminal to stop the server.
 
 ---
 
-## 8. Resetting the simulated controllers
+## 8. Resetting the lab
 
-The project includes a reset script that restores the seven default refrigeration controllers.
+The project includes a reset script that restores the default state of the lab.
 
 From the project root:
 
-**Windows:**
-
-```powershell
-python .\reset_devices.py
-```
-
-**Ubuntu:**
-
 ```bash
-python3 reset_devices.py
+python reset_devices.py
 ```
 
-This restores the initial controller data in `lab_data/devices.json`.
+This restores:
+
+- The seven default refrigeration controllers in `lab_data/devices.json`.
+- The original NGINX configuration in `lab_data/headers.conf`.
+
+Expected output:
+
+```text
+[OK] Controllers successfully reset.
+[OK] File updated: ...
+[OK] NGINX headers configuration successfully reset.
+[OK] File updated: ...
+
+[OK] Lab reset completed.
+```
 
 ---
 
@@ -400,7 +360,7 @@ The three vulnerabilities can be studied in the following order:
 
 1. **CVE-2025-41450:** Understand the authentication mechanism and obtain a browser session.
 2. **CVE-2025-41451:** Explore the SMTP configuration page and the server-side identity-command test.
-3. **CVE-2025-41452:** Replace the simulated NGINX configuration and test the injected routes.
+3. **CVE-2025-41452:** Replace the simulated NGINX configuration and test the injected failure route.
 
 This sequence demonstrates how an authentication weakness can expose privileged configuration functionality, which may then lead to further compromise of a management interface.
 
